@@ -54,7 +54,7 @@ def createSubPlot(side_points, convex_points):
     frames_temp.append((pointsX, pointsY))
 
 
-def QuickHullRec2(points: list[tuple], line_p1: tuple, line_p2: tuple, side: int):
+def QuickHullRec(points: list[tuple], line_p1: tuple, line_p2: tuple, side: int):
 
     convex_points = []
     same_side_points = []
@@ -77,11 +77,11 @@ def QuickHullRec2(points: list[tuple], line_p1: tuple, line_p2: tuple, side: int
 
     createSubPlot(same_side_points, convex_points + [line_p1, line_p2])
 
-    convex_points += QuickHullRec2(points, line_p1, max_point, lowerOrUpper(line_p1, line_p2, max_point))
-    convex_points += QuickHullRec2(points, line_p2, max_point, lowerOrUpper(line_p2, line_p1, max_point))
+    convex_points += QuickHullRec(points, line_p1, max_point, lowerOrUpper(line_p1, line_p2, max_point))
+    convex_points += QuickHullRec(points, line_p2, max_point, lowerOrUpper(line_p2, line_p1, max_point))
     return convex_points
 
-def QuickHull2(points: list[tuple]):
+def QuickHull(points: list[tuple]):
     if len(points) < 3:
         return points
 
@@ -92,31 +92,32 @@ def QuickHull2(points: list[tuple]):
 
     createSubPlot(points, [minPoint, maxPoint])
 
-    convex_points += QuickHullRec2(points, minPoint, maxPoint, 1) # upper side
-    convex_points += QuickHullRec2(points, minPoint, maxPoint, -1) # lower side
+    convex_points += QuickHullRec(points, minPoint, maxPoint, 1) # upper side
+    convex_points += QuickHullRec(points, minPoint, maxPoint, -1) # lower side
     
     return set(convex_points)
 
-def animateConvexHull(points, pause_interval = 0.5, generate_random_points = True, pointRange = 10000, num_of_points = 100):
-
+def QuickHullWrapper(points, generate_random_points = True, pointRange = 10000, num_of_points = 100):
     if generate_random_points == True:
         possiblePoint = range(int(pointRange))
-        for i in range(num_of_points):
+        for i in range(int(num_of_points)):
             point = tuple(random.sample(possiblePoint, 2))
             points += [point]
 
-    outputPoints = QuickHull2(points)
+    outputPoints = QuickHull(points)
     print('done quickhull2')
     outputPoints = sortCounterClockwise(list(outputPoints))
     print('done sorting counter clockwise')
     print(outputPoints)
 
-    tempPoints = []
-    
-    pointHash = {}
-    # x = 0; y = 1
+    return outputPoints
 
-    # ax1 = plt.subplot()
+def animateConvexHull(points, pause_interval = 0.5, generate_random_points = True, pointRange: int = 10000, num_of_points: int = 100):
+    outputPoints = QuickHullWrapper(points, generate_random_points, pointRange, num_of_points)
+
+    tempPoints = []
+    pointHash = {}
+
     for temp_points in reversed(frames_temp[1:]):
         temp = []
         c = 0
@@ -135,9 +136,7 @@ def animateConvexHull(points, pause_interval = 0.5, generate_random_points = Tru
     tPL = len(tempPoints)
 
     for grp in frames:
-        # plt.plot(grp[0], grp[1], 'ro')
         tempLines += plt.plot(grp[0], grp[1], 'ro-')
-        # plt.pause(pause_interval)
 
         if counter > -1 and counter < tPL:
             for ij in tempPoints[counter]:
@@ -177,7 +176,7 @@ def animateConvexHull2(points):
         tempPoints += plt.plot(pointsX, pointsY, 'bo')
         plt.pause(interval)
     
-    output = QuickHull2(points)
+    output = QuickHull(points)
     output = sortCounterClockwise(list(output))
 
     outputX = []
@@ -204,37 +203,20 @@ def animateConvexHull2(points):
 
 def animateConvexHull3(points, pause_interval = 0.5, generate_random_points = True, pointRange = 10000, num_of_points = 100):
 
-    if generate_random_points == True:
-        possiblePoint = range(int(pointRange))
-        for i in range(int(num_of_points)):
-            point = tuple(random.sample(possiblePoint, 2))
-            points.append(point)
-
-    outputPoints = QuickHull2(points)
-    print('done quickhull2')
-    outputPoints = sortCounterClockwise(list(outputPoints))
-    print('done sorting counter clockwise')
-    print(outputPoints)
+    outputPoints = QuickHullWrapper(points, generate_random_points, pointRange, num_of_points)
 
     tempPoints = []
-    
-    pointHash = {}
-    pointsInCluster = []
-    # x = 0; y = 1
-
     
     for temp_points in reversed(frames_temp[1:]):
         tempPoints += plt.plot(temp_points[0], temp_points[1], 'bo')
     
     
     tempPoints.reverse()
-    pointsInCluster.reverse()
     counter = -1
     tempLines = []
     tPL = len(tempPoints)
 
     for grp in frames:
-        # plt.plot(grp[0], grp[1], 'ro')
         tempLines += plt.plot(grp[0], grp[1], 'ro-')
 
         if counter > -1 and counter < tPL:
@@ -244,8 +226,6 @@ def animateConvexHull3(points, pause_interval = 0.5, generate_random_points = Tr
         counter += 1
         plt.pause(pause_interval)
     
-    # outputPointsX = []
-    # outputPointsY = []
     length = len(outputPoints)
     counter = 0
     for i in range(length + 1):
@@ -260,9 +240,19 @@ def animateConvexHull3(points, pause_interval = 0.5, generate_random_points = Tr
 
     
     plt.show()
+
+def animationGovernor(points, generate_random_points, num_of_points):
+    plt.title("Creating Convex Hull from Random Points")
+    if num_of_points > 1e4:
+        animateConvexHull3(points, generate_random_points, pause_interval = 1, pointRange = 1e3 * num_of_points, num_of_points = 1e6)
+    else:
+        animateConvexHull(points, generate_random_points, pause_interval = 1, pointRange = 1e2 * num_of_points, num_of_points = 1e6)
+    
+    
+
 if __name__ == '__main__':
 
-    plt.title("Creating Convex Hull from Random Points")
+    
     # points = [ (0, 3), (1, 1), (2, 2), (4, 4),
     #            (0, 0), (1, 2), (3, 1), (3, 3)] # ans: {(4, 4), (0, 3), (3, 1), (0, 0)}
 
@@ -276,96 +266,4 @@ if __name__ == '__main__':
               (-3, -1), (-1, -3), (-2, -2), (-1, -1),
               (-2, -1), (-1, 1)] # ans: (-5, 3), (-1, -5), (-1, -4), (0, 0), (-1, 1)  
     
-    animateConvexHull3(points, generate_random_points = False, pause_interval = 2, pointRange = 1e9, num_of_points = 1e6)
-    # animateConvexHull2(points)
-    # # points = []
-    # possible = range(1000000)
-    # # print(possible)
-    # # for i in range(10000):
-    # #     point = tuple(random.sample(possible, 2))
-    # #     points += [point]
-
-    # print("done")
-    # # pointsX = []
-    # # pointsY = []
-    # # for i in points:
-    # #     pointsX.append(i[0])
-    # #     pointsY.append(i[1])
-    # #     plt.plot(pointsX, pointsY, 'go')
-    # #     plt.pause(0.01)
-    
-    
-    # # animateConvexHull2(points)
-    # outputPoints = QuickHull2(points)
-    # print('done quickhull2')
-    # outputPoints = sortCounterClockwise(list(outputPoints))
-    # print('done sorting counter clockwise')
-    # print(outputPoints)
-    # # fig, ax = plt.subplots()
-    # # ax.plot(pointsX, pointsY, 'yo')
-    # # # plt.show()
-
-    # pointsX: list = []
-    # pointsY: list = []
-    # tempPoints = []
-    
-    # pointHash = {}
-    # pointsInCluster = []
-    # for temp_points in reversed(frames_temp[1:]):
-
-    #     temp1 = temp_points[0]
-    #     temp2 = temp_points[1]
-    #     temp3 = []
-    #     c = 0
-    #     for x, y in tuple(zip(temp1, temp2)):
-    #         if pointHash.get((x,y)) is None:
-    #             temp3 += plt.plot(x, y, 'bo')
-    #             pointHash[(x, y)] = True
-    #             c += 1
-    #             # plt.pause(0.01)
-    
-    #     pointsInCluster += [c]
-    #     tempPoints += [temp3]
-    #     # pointsX.append(temp1)
-    #     # pointsY.append(temp2)
-    
-    # tempPoints.reverse()
-    # pointsInCluster.reverse()
-    # counter = -1
-    # tempLines = []
-    # tempLinesP = []
-    # tPL = len(tempPoints)
-    # for grp in frames:
-    #     plt.plot(grp[0], grp[1], 'ro')
-    #     tempLines += plt.plot(grp[0], grp[1], 'r-')
-    #     plt.pause(0.1)
-    #     # for k in tempPoints:
-    #     #     counter += 1
-    #     if counter > -1 and counter < tPL:
-    #         for ij in tempPoints[counter]:
-    #             ij.set_visible(False)
-    #             # plt.pause(0.01)
-    #     print(counter, "num of iters", len(frames_temp))
-    #     counter += 1
-    #     plt.pause(0.5)
-    
-    # outputPointsX = []
-    # outputPointsY = []
-    # length = len(outputPoints)
-    # counter = 0
-    # for i in range(length + 1):
-    #     index = i % length
-    #     outputPointsX.append(outputPoints[index][0])
-    #     outputPointsY.append(outputPoints[index][1])
-
-        
-    #     plt.plot(outputPointsX, outputPointsY, 'go')
-    #     plt.plot(outputPointsX, outputPointsY, 'g-')
-    #     plt.pause(.5)
-    
-    # for k in range(len(tempLines)):
-    #     tempLines[k].remove()
-    #     plt.plot(outputPointsX[0], outputPointsY[0], 'go')
-    #     plt.pause(.5)
-
-    # plt.show()    
+    animationGovernor(points, generate_random_points = True, num_of_points = 1e6)   
