@@ -244,9 +244,9 @@ def animateConvexHull3(points, pause_interval = 0.5, generate_random_points = Tr
 def animationGovernor(points, generate_random_points, num_of_points):
     plt.title("Creating Convex Hull from Random Points")
     if num_of_points > 1e4:
-        animateConvexHull3(points, generate_random_points, pause_interval = 1, pointRange = 1e3 * num_of_points, num_of_points = 1e6)
+        animateConvexHull3(points, pause_interval = 1, generate_random_points = generate_random_points, pointRange = 1e3 * num_of_points, num_of_points = 1e6)
     else:
-        animateConvexHull(points, generate_random_points, pause_interval = 1, pointRange = 1e2 * num_of_points, num_of_points = 1e6)
+        animateConvexHull(points, pause_interval = 1, generate_random_points = generate_random_points, pointRange = 1e3 * num_of_points, num_of_points = 1e6)
     
     
 
