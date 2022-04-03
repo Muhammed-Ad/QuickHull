@@ -114,7 +114,6 @@ def animateConvexHull(points, pause_interval = 0.5, generate_random_points = Tru
     tempPoints = []
     
     pointHash = {}
-    pointsInCluster = []
     # x = 0; y = 1
 
     # ax1 = plt.subplot()
@@ -128,18 +127,16 @@ def animateConvexHull(points, pause_interval = 0.5, generate_random_points = Tru
                 pointHash[(x, y)] = True
                 c += 1
     
-        pointsInCluster.append(c)
         tempPoints.append(temp)
     
     tempPoints.reverse()
-    pointsInCluster.reverse()
     counter = -1
     tempLines = []
     tPL = len(tempPoints)
 
     for grp in frames:
-        plt.plot(grp[0], grp[1], 'ro')
-        tempLines += plt.plot(grp[0], grp[1], 'r-')
+        # plt.plot(grp[0], grp[1], 'ro')
+        tempLines += plt.plot(grp[0], grp[1], 'ro-')
         # plt.pause(pause_interval)
 
         if counter > -1 and counter < tPL:
@@ -150,8 +147,7 @@ def animateConvexHull(points, pause_interval = 0.5, generate_random_points = Tru
         counter += 1
         plt.pause(pause_interval)
     
-    outputPointsX = []
-    outputPointsY = []
+    
     length = len(outputPoints)
     counter = 0
     for i in range(length + 1):
@@ -210,9 +206,9 @@ def animateConvexHull3(points, pause_interval = 0.5, generate_random_points = Tr
 
     if generate_random_points == True:
         possiblePoint = range(int(pointRange))
-        for i in range(num_of_points):
+        for i in range(int(num_of_points)):
             point = tuple(random.sample(possiblePoint, 2))
-            points += [point]
+            points.append(point)
 
     outputPoints = QuickHull2(points)
     print('done quickhull2')
@@ -238,8 +234,8 @@ def animateConvexHull3(points, pause_interval = 0.5, generate_random_points = Tr
     tPL = len(tempPoints)
 
     for grp in frames:
-        plt.plot(grp[0], grp[1], 'ro')
-        tempLines += plt.plot(grp[0], grp[1], 'r-')
+        # plt.plot(grp[0], grp[1], 'ro')
+        tempLines += plt.plot(grp[0], grp[1], 'ro-')
 
         if counter > -1 and counter < tPL:
             tempPoints[counter].remove()
@@ -280,7 +276,7 @@ if __name__ == '__main__':
               (-3, -1), (-1, -3), (-2, -2), (-1, -1),
               (-2, -1), (-1, 1)] # ans: (-5, 3), (-1, -5), (-1, -4), (0, 0), (-1, 1)  
     
-    animateConvexHull3(points, generate_random_points = False, pause_interval = 1, pointRange = 1e9)
+    animateConvexHull3(points, generate_random_points = False, pause_interval = 2, pointRange = 1e9, num_of_points = 1e6)
     # animateConvexHull2(points)
     # # points = []
     # possible = range(1000000)
