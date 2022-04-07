@@ -1,9 +1,14 @@
 from matplotlib import pyplot as plt
 from matplotlib.animation import FuncAnimation
-import math, random, time
+import math, random, time, enum
 
 frames = []
 frames_temp = []
+
+class Side(enum.Enum): #Makes code more readable
+    lower = -1
+    inline = 0
+    upper = 1
 
 def CrossProd2D(line_p1, line_p2, point):
     x = 0
@@ -16,7 +21,7 @@ def lowerOrUpper(line_p1, line_p2, point):
     distMetric: int = CrossProd2D(line_p1, line_p2, point)
     
     if distMetric == 0:
-        return 0
+        return Side.inline.value
     else:
         return distMetric / abs(distMetric)
 
@@ -53,7 +58,6 @@ def createSubPlot(side_points, convex_points):
 
 
 def QuickHullRec(points: list[tuple], line_p1: tuple, line_p2: tuple, side: int, createSubplot = True):
-
     convex_points = []
     same_side_points = []
     max_distance = -1
@@ -92,29 +96,43 @@ def QuickHull(points: list[tuple], createSubplot = True):
     if createSubplot:
         createSubPlot(points, [minPoint, maxPoint])
 
-    convex_points += QuickHullRec(points, minPoint, maxPoint, 1, createSubplot) # upper side
-    convex_points += QuickHullRec(points, minPoint, maxPoint, -1, createSubplot) # lower side
+    convex_points += QuickHullRec(points, minPoint, maxPoint, Side.upper.value, createSubplot) # upper side
+    convex_points += QuickHullRec(points, minPoint, maxPoint, Side.lower.value, createSubplot) # lower side
     
     return set(convex_points)
 
 def QuickHullWrapper(points, generate_random_points = True, pointRange = 10000, num_of_points = 100, createSubplot = True):
     if generate_random_points == True:
-        possiblePoint = range(int(pointRange))
+        possiblePoints = range(int(pointRange))
         num_of_points = int(num_of_points)
         dim = 2
-        Li = random.sample(possiblePoint, dim*num_of_points) #create list of num_of_point group of dim tuples from possiblePoint range 
-        points += zip(*[iter(Li)]*dim) #make dim copies of iterators and break-up those dim copies up to create of list of tuples that dim in length
-        
+        shape = 1
+        if shape == 0:
+            Li = random.sample(possiblePoints, dim*num_of_points) #create list of num_of_point group of dim tuples from possiblePoint range 
+            points += zip(*[iter(Li)]*dim) #make dim copies of iterators and break-up those dim copies up to create of list of tuples that dim in length
+        elif shape == 1:
+            R = 5
+            Li = []
+            # (b*R*cos(2*pi*a/b), b*R*sin(2*pi*a/b)).
+            # for j in range(dim):
+            # rand = random.Random()
+            for i in range(num_of_points):
+                r = R * math.sqrt(random.uniform(0, 1.0))
+                theta = random.uniform(0, 1.0) * 2 * math.pi
+                Li.append((r*math.cos(theta), r*math.sin(theta)))
+            points += Li
+        elif shape == 2:
+            points += [(random.uniform(0, 1.0), random.uniform(0, 1.0)) for _ in range(num_of_points)]
 
     start = time.time()
     outputPoints = QuickHull(points, createSubplot)
     amt = time.time() - start 
-    print(f'done quickhull in: {amt}')
+    print(f'done quickhull in: {amt}s')
 
     start1 = time.time()
     outputPoints = sortCounterClockwise(list(outputPoints))
     amt1 = time.time() - start1
-    print(f'done sorting counter clockwise in: {amt1}')
+    print(f'done sorting counter clockwise in: {amt1}s')
     print(outputPoints)
 
     return outputPoints
@@ -234,16 +252,16 @@ def animateConvexHull3(points, pause_interval = 0.5, generate_random_points = Tr
     
     plt.show()
 
-def animationGovernor(points, generate_random_points, num_of_points, just_outline = False):
+def animationGovernor(points, generate_random_points, num_of_points, just_outline = False, pause_interval = 1):
     plt.title("Creating Convex Hull from Random Points")
 
     if just_outline:
         animateConvexHull2(points, pause_interval = 1)
     else:
-        if num_of_points > 1e4 and generate_random_points:
-            animateConvexHull3(points, pause_interval = 1, generate_random_points = generate_random_points, pointRange = 1e3 * num_of_points, num_of_points = 1e6)
+        if num_of_points >= 1e4 and generate_random_points:
+            animateConvexHull3(points, pause_interval = 1, generate_random_points = generate_random_points, pointRange = 1e3 * num_of_points, num_of_points = num_of_points)
         else:
-            animateConvexHull(points, pause_interval = 1, generate_random_points = generate_random_points, pointRange = 1e3 * num_of_points, num_of_points = 1e6)
+            animateConvexHull(points, pause_interval = 1, generate_random_points = generate_random_points, pointRange = 1e3 * num_of_points, num_of_points = num_of_points)
         
         
 
@@ -259,9 +277,11 @@ if __name__ == '__main__':
     # points = [(0, 0), (0, 4), (-4, 0), (5, 0), 
     #           (0, -6), (1, 0)] # ans: (-4, 0), (5, 0), (0, -6), (0, 4)
 
-    points = [(0, 0), (1, -4), (-1, -5), (-5, -3), 
-              (-3, -1), (-1, -3), (-2, -2), (-1, -1),
-              (-2, -1), (-1, 1)] # ans: (-5, 3), (-1, -5), (-1, -4), (0, 0), (-1, 1)  
+    # points = [(0, 0), (1, -4), (-1, -5), (-5, -3), 
+    #           (-3, -1), (-1, -3), (-2, -2), (-1, -1),
+    #           (-2, -1), (-1, 1)] # ans: (-5, 3), (-1, -5), (-1, -4), (0, 0), (-1, 1)  
+
+    points = []
     
-    QuickHullWrapper(points, generate_random_points=True, pointRange=1e12, num_of_points=1e9, createSubplot = False)
-    #  animationGovernor(points, generate_random_points = False, num_of_points = 1e6, just_outline = True)   
+    # QuickHullWrapper(points, generate_random_points=True, pointRange=1e12, num_of_points=1e2, createSubplot = True)
+    animationGovernor(points, generate_random_points = True, num_of_points = 1e6, just_outline = False, pause_interval = .000000000001)   
