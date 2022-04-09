@@ -300,5 +300,5 @@ def measureSpeedNoAnimation(num_of_points=1e2, shape=0):
     
 
 if __name__ == '__main__':
-    measureSpeedNoAnimation(num_of_points=1e6, shape=Shape.Cluster.value)
+    measureSpeedNoAnimation(num_of_points=1e5, shape=Shape.Cluster.value)
     # animationGovernor(generate_random_points = True, num_of_points = 1e5, just_outline = False, pause_interval = .000000000001, shape = Shape.Cluster.value)   
