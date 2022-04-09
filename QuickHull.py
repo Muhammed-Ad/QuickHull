@@ -27,6 +27,7 @@ def CrossProd2D(line_p1, line_p2, point):
     # <point, line_p1> x <line_p1, line_p2> or P1P x P2P1
     return (point[y] - line_p1[y]) * (line_p2[x] - line_p1[x]) - (line_p2[y] - line_p1[y]) * (point[x] - line_p1[x])
 
+# 1, 0, -1 depending on side
 def lowerOrUpper(line_p1, line_p2, point):
 
     distMetric: int = CrossProd2D(line_p1, line_p2, point)
@@ -36,8 +37,9 @@ def lowerOrUpper(line_p1, line_p2, point):
     else:
         return distMetric / abs(distMetric)
 
+# not distance but an approximation
 def distPointToLine(line_p1, line_p2, point):
-    return abs(CrossProd2D(line_p1, line_p2, point)) #not distnace but an approximation
+    return abs(CrossProd2D(line_p1, line_p2, point)) 
 
 # From StackOverflow: https://stackoverflow.com/a/69104076
 # Sort point counter clockwise aroudn calculated center, used to make animation
@@ -279,8 +281,9 @@ def animateConvexHull3(points, pause_interval = 0.5, generate_random_points = Tr
     
     plt.show()
 
-def animationGovernor(points, generate_random_points, num_of_points, just_outline = False, pause_interval = 1, shape = 0):
+def animationGovernor(generate_random_points, num_of_points, just_outline = False, pause_interval = 1, shape = 0):
     plt.title("Creating Convex Hull from Random Points")
+    points = []
 
     if just_outline:
         animateConvexHull2(points, pause_interval = pause_interval, shape = shape)
@@ -290,25 +293,11 @@ def animationGovernor(points, generate_random_points, num_of_points, just_outlin
         else:
             animateConvexHull(points, pause_interval = pause_interval, generate_random_points = generate_random_points, pointRange = 1e3 * num_of_points, num_of_points = num_of_points, shape = shape)
         
-        
+def measureSpeedNoAnimation(num_of_points=1e2, shape=0):
+    points = []
+    QuickHullWrapper(points, generate_random_points=True, pointRange=num_of_points*1e3, num_of_points=num_of_points, createSubplot = False, shape = shape)
+    
 
 if __name__ == '__main__':
-
-    
-    # points = [ (0, 3), (1, 1), (2, 2), (4, 4),
-    #            (0, 0), (1, 2), (3, 1), (3, 3)] # ans: {(4, 4), (0, 3), (3, 1), (0, 0)}
-
-    # points = [ (0, 3), (1, 1), (2, 2), (2, 1),
-    #            (3, 0), (0, 0), (3, 3)] # ans: {(0, 3), (3, 3), (3, 0), (0, 0)}
-
-    # points = [(0, 0), (0, 4), (-4, 0), (5, 0), 
-    #           (0, -6), (1, 0)] # ans: (-4, 0), (5, 0), (0, -6), (0, 4)
-
-    # points = [(0, 0), (1, -4), (-1, -5), (-5, -3), 
-    #           (-3, -1), (-1, -3), (-2, -2), (-1, -1),
-    #           (-2, -1), (-1, 1)] # ans: (-5, 3), (-1, -5), (-1, -4), (0, 0), (-1, 1)  
-
-    points = []
-    
-    # QuickHullWrapper(points, generate_random_points=True, pointRange=1e12, num_of_points=1e2, createSubplot = True)
-    animationGovernor(points, generate_random_points = True, num_of_points = 1e5, just_outline = False, pause_interval = .000000000001, shape = Shape.Cluster.value)   
+    # measureSpeedNoAnimation()
+    animationGovernor(generate_random_points = True, num_of_points = 1e5, just_outline = False, pause_interval = .000000000001, shape = Shape.Cluster.value)   
