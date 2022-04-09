@@ -12,6 +12,7 @@ class Shape(enum.Enum):
     Square = 2
     OutlinedCircle = 3
     Cluster = 4
+    
 class Side(enum.Enum): 
     lower = -1
     inline = 0
@@ -42,7 +43,7 @@ def distPointToLine(line_p1, line_p2, point):
     return abs(CrossProd2D(line_p1, line_p2, point)) 
 
 # From StackOverflow: https://stackoverflow.com/a/69104076
-# Sort point counter clockwise aroudn calculated center, used to make animation
+# Sort point counter clockwise around calculated center, used to make animation
 # QuickHull Process accurate
 def sortCounterClockwise(points, center = None):
   if center:
@@ -282,7 +283,7 @@ def animateConvexHull3(points, pause_interval = 0.5, generate_random_points = Tr
     plt.show()
 
 def animationGovernor(generate_random_points, num_of_points, just_outline = False, pause_interval = 1, shape = 0):
-    plt.title("Creating Convex Hull from Random Points")
+    plt.title("Creating Convex Hull from Random Points") # implement figures to draw multiple shapes at once
     points = []
 
     if just_outline:
@@ -299,5 +300,5 @@ def measureSpeedNoAnimation(num_of_points=1e2, shape=0):
     
 
 if __name__ == '__main__':
-    # measureSpeedNoAnimation()
-    animationGovernor(generate_random_points = True, num_of_points = 1e5, just_outline = False, pause_interval = .000000000001, shape = Shape.Cluster.value)   
+    measureSpeedNoAnimation(num_of_points=1e6, shape=Shape.Cluster.value)
+    # animationGovernor(generate_random_points = True, num_of_points = 1e5, just_outline = False, pause_interval = .000000000001, shape = Shape.Cluster.value)   
