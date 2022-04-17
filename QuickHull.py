@@ -1,6 +1,7 @@
 from matplotlib import pyplot as plt
 from matplotlib.animation import FuncAnimation
-import math, random, time, enum
+import math, random, time, enum, sys, os, psutil, gc, statistics
+# from memory_profiler import profile
 
 frames = []
 frames_temp = []
@@ -73,6 +74,7 @@ def createSubPlot(side_points, convex_points):
     frames.append((outputX, outputY))
     frames_temp.append((pointsX, pointsY))
 
+
 # Recursive QuickHull function to deal with partitioning points and calculating Convex Hull
 def QuickHullRec(points: list[tuple], line_p1: tuple, line_p2: tuple, side: int, createSubplot = True):
     convex_points = []
@@ -101,6 +103,54 @@ def QuickHullRec(points: list[tuple], line_p1: tuple, line_p2: tuple, side: int,
     convex_points += QuickHullRec(same_side_points, line_p2, max_point, lowerOrUpper(line_p2, line_p1, max_point), createSubplot)
     return convex_points
 
+def QuickHullMod(points: list[tuple], createSubplot = True):
+    if len(points) < 3:
+        return set(points)
+
+    convex_points = list([])
+    points.sort(key = lambda x : (x[0], x[1]))
+    minPoint = points[0]
+    maxPoint = points[-1]
+
+    def QuickHullRecMod(line_p1: tuple, line_p2: tuple, side: int, createSubplot = True):
+        
+        same_side_points = []
+        max_distance = -1
+        max_point = None
+        
+        for point in points:
+            distance = distPointToLine(line_p1, line_p2, point)
+            point_side = lowerOrUpper(line_p1, line_p2, point)
+            if point_side == side:
+                if createSubplot:
+                    same_side_points += [point]
+                if distance > max_distance:
+                    max_distance = distance
+                    max_point = point
+
+        if max_distance == -1:
+            nonlocal convex_points
+            convex_points += [line_p1, line_p2]
+            return
+        else:
+            convex_points += [max_point]
+
+        if createSubplot:
+            createSubPlot(same_side_points, convex_points + [line_p1, line_p2])
+
+        QuickHullRecMod(line_p1, max_point, lowerOrUpper(line_p1, line_p2, max_point), createSubplot)
+        QuickHullRecMod(line_p2, max_point, lowerOrUpper(line_p2, line_p1, max_point), createSubplot)
+        
+
+    if createSubplot:
+        createSubPlot(points, [minPoint, maxPoint])
+
+    QuickHullRecMod(minPoint, maxPoint, Side.upper.value, createSubplot) # upper side
+    QuickHullRecMod(minPoint, maxPoint, Side.lower.value, createSubplot) # lower side
+    
+    return set(convex_points)
+
+
 # Non-Recursive QuickHull function to call QuickHull Recursive from
 def QuickHull(points: list[tuple], createSubplot = True):
     if len(points) < 3:
@@ -121,47 +171,79 @@ def QuickHull(points: list[tuple], createSubplot = True):
 
 # QuickHull Wrapper function to generate different point shapes and call the on-recursive QuickHull
 def QuickHullWrapper(points, generate_random_points = True, pointRange = 10000, num_of_points = 100, createSubplot = True, shape = 0):
+    write_file = False
     if generate_random_points == True:
-        possiblePoints = range(int(pointRange))
+        R = int(pointRange)
+        possiblePoints = range(R)
         num_of_points = int(num_of_points)
         dim = 2
-        if shape == 0: # best case, easy deletion of a lot of points
+
+        
+
+        if shape == 0: # Average case
             Li = random.sample(possiblePoints, dim*num_of_points) # create list of num_of_point group of dim tuples from possiblePoint range 
             points += zip(*[iter(Li)]*dim)  # make dim copies of iterators and break-up those dim copies up to create of list of tuples that dim in length
         
-        elif shape == 1: # slightly better worst case, Filled Cicrle
-            R = 5
+        elif shape == 1: # Close to best case, better than avg case
             for i in range(num_of_points):
                 r = R * math.sqrt(random.uniform(0, 1.0))
                 theta = random.uniform(0, 1.0) * 2 * math.pi
                 points.append((r*math.cos(theta), r*math.sin(theta)))
 
-        elif shape == 2: # Square
-            points += [(random.uniform(0, 1.0), random.uniform(0, 1.0)) for _ in range(num_of_points)]
+        elif shape == 2: # Square, similar case to random sample
+            points += [(random.uniform(0, R), random.uniform(0, R)) for _ in range(num_of_points)]
         
-        elif shape == 3: # worst case, outline of circle
-            R = 5
-            
+        elif shape == 3: # Worst case, outline of circle
+            r = R
             for i in range(num_of_points):
-                r = R 
                 theta = random.uniform(0, 1.0) * 2 * math.pi
                 points.append((r*math.cos(theta), r*math.sin(theta)))
             
-        elif shape == 4: # cluster of points, probably avg case
-            mean = 5
-            standard_deviation = 1
-            points += [(random.normalvariate(mean, standard_deviation), random.normalvariate(mean, standard_deviation)) for _ in range(num_of_points)]
+        elif shape == 4: # Cluster of points, Best Case
+            mean = (R - 1) / 2 # Sum of numbers from 0 - R-1 inclusive divided by R to get mean (mean of first R -1 naural numbers)
 
-    start = time.time()
+            standard_deviation = (((R**2) - 1)/ 12) ** 0.5 # std devation of n natural numbers (not exactly std of n-1 natural numbers but differnece is n minimal with large sets)
+            limit = int(1e9)
+
+            if num_of_points <= limit:
+                points += [(random.normalvariate(mean, standard_deviation), random.normalvariate(mean, standard_deviation)) for _ in range(num_of_points)]
+            else:
+                write_file = True
+                fp = open('randPoints.txt', 'w')
+                for i in range(num_of_points):
+                    points += [(random.normalvariate(mean, standard_deviation), random.normalvariate(mean, standard_deviation))]
+                    if i % (limit * 0.5) == 0:
+                        for point in points:
+                            fp.write("%d %d\n" % point)
+                        
+                        del points[:]
+                        gc.collect()
+                fp.close()
+
+    
+    if write_file:
+        with open('randPoints.txt', 'r') as fp:
+            points = [tuple(map(float, i.split())) for i in fp]
+
+    # psutil.Process(os.getpid()).memory_info().rss ---Gives memory in bytes
+
+    start = time.perf_counter()
     outputPoints = QuickHull(points, createSubplot)
-    amt = time.time() - start 
+    amt = time.perf_counter() - start 
     print(f'done quickhull in: {amt}s')
+    print("Number of points on hull:", len(outputPoints))
+    print("Memory Used:", psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3, "GB")
 
-    start1 = time.time()
+    # start = time.time()
+    # outputPoints = QuickHullMod(points, createSubplot) # SLOW, VERY SLOW
+    # amt = time.time() - start 
+    # print(f'done quickhull in: {amt}s')
+
+    start1 = time.perf_counter()
     outputPoints = sortCounterClockwise(list(outputPoints))
-    amt1 = time.time() - start1
+    amt1 = time.perf_counter() - start1
     print(f'done sorting counter clockwise in: {amt1}s')
-    print(outputPoints)
+    # print(outputPoints)
 
     return outputPoints
 
@@ -296,9 +378,37 @@ def animationGovernor(generate_random_points, num_of_points, just_outline = Fals
         
 def measureSpeedNoAnimation(num_of_points=1e2, shape=0):
     points = []
-    QuickHullWrapper(points, generate_random_points=True, pointRange=num_of_points*1e3, num_of_points=num_of_points, createSubplot = False, shape = shape)
+    QuickHullWrapper(points, generate_random_points = True, pointRange=num_of_points*1e3, num_of_points=num_of_points, createSubplot = False, shape = shape)
     
 
 if __name__ == '__main__':
-    measureSpeedNoAnimation(num_of_points=1e5, shape=Shape.Cluster.value)
-    # animationGovernor(generate_random_points = True, num_of_points = 1e5, just_outline = False, pause_interval = .000000000001, shape = Shape.Cluster.value)   
+    if len(sys.argv) < 2:
+        raise ValueError('Need number of points to perform QuickHull on!')
+    
+    try: 
+        num = int(sys.argv[1])
+    except ValueError:
+        print('Invalid input! Cannot convert %s to base 10 integer. Program Closing...' % sys.argv[1])
+    else:
+        print("Random Sample: ")
+        measureSpeedNoAnimation(num_of_points=int(num), shape=Shape.RandomSample.value)
+        
+        print("\n\nFilled Circle: ")
+        measureSpeedNoAnimation(num_of_points=int(num), shape=Shape.FilledCircle.value)
+        
+        print("\n\nSquare: ")
+        measureSpeedNoAnimation(num_of_points=int(num), shape=Shape.Square.value)
+        
+        print("\n\nOutlined Circle: ")
+        measureSpeedNoAnimation(num_of_points=int(num), shape=Shape.OutlinedCircle.value)
+        
+        print("\n\nCluster: ")
+        measureSpeedNoAnimation(num_of_points=int(num), shape=Shape.Cluster.value)
+
+        print("\n\nRandom Sample: ")
+        measureSpeedNoAnimation(num_of_points=int(num), shape=Shape.RandomSample.value)
+    
+    
+        # animationGovernor(generate_random_points = True, num_of_points = 1e5, just_outline = False, pause_interval = .1, shape = Shape.Cluster.value)   
+
+    
