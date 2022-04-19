@@ -1,10 +1,11 @@
 from matplotlib import pyplot as plt
 from matplotlib.animation import FuncAnimation
-import math, random, time, enum, sys, os, psutil, gc, statistics
+import math, random, time, enum, sys, os, psutil, gc, json
 # from memory_profiler import profile
 
 frames = []
 frames_temp = []
+results = []
 
 # Makes code more readable, using enuams for shape and side of lines
 class Shape(enum.Enum): 
@@ -226,13 +227,24 @@ def QuickHullWrapper(points, generate_random_points = True, pointRange = 10000, 
             points = [tuple(map(float, i.split())) for i in fp]
 
     # psutil.Process(os.getpid()).memory_info().rss ---Gives memory in bytes
-
+    s = Shape(shape)
+    print("Shape: ", s)
     start = time.perf_counter()
     outputPoints = QuickHull(points, createSubplot)
     amt = time.perf_counter() - start 
     print(f'done quickhull in: {amt}s')
-    print("Number of points on hull:", len(outputPoints))
-    print("Memory Used:", psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3, "GB")
+    numPo = len(outputPoints)
+    print("Number of points on hull:", numPo)
+    memUsed = psutil.Process(os.getpid()).memory_info().rss / 1024 ** 3
+    print("Memory Used:", memUsed, "GB")
+
+    global results
+    results += [{
+        'Shape': s.name,
+        'Time': amt,
+        'Points on Hull': numPo,
+        'Memory Used': memUsed
+    }]
 
     # start = time.time()
     # outputPoints = QuickHullMod(points, createSubplot) # SLOW, VERY SLOW
@@ -376,39 +388,50 @@ def animationGovernor(generate_random_points, num_of_points, just_outline = Fals
         else:
             animateConvexHull(points, pause_interval = pause_interval, generate_random_points = generate_random_points, pointRange = 1e3 * num_of_points, num_of_points = num_of_points, shape = shape)
         
-def measureSpeedNoAnimation(num_of_points=1e2, shape=0):
+def measureSpeedNoAnimation(num_of_points = 1e2, trials = 3):
     points = []
-    QuickHullWrapper(points, generate_random_points = True, pointRange=num_of_points*1e3, num_of_points=num_of_points, createSubplot = False, shape = shape)
+    trials = 3
     
+    for shape in Shape:
+        if shape.value == Shape.OutlinedCircle.value and num_of_points > int(1e7):
+            continue
+        else:
+            for trial in range(trials):
+                QuickHullWrapper(points, generate_random_points = True, pointRange=num_of_points*1e3, num_of_points=num_of_points, createSubplot = False, shape = shape.value)
+                del points[:]
+                gc.collect()
+
+def inputVal(arg):
+    try: 
+        num = int(arg)
+    except ValueError:
+        print('Invalid input! Cannot convert %s to base 10 integer. Program Closing...' % arg)
+        sys.exit(1)
+    else:
+        return num
 
 if __name__ == '__main__':
-    if len(sys.argv) < 2:
-        raise ValueError('Need number of points to perform QuickHull on!')
-    
-    try: 
-        num = int(sys.argv[1])
-    except ValueError:
-        print('Invalid input! Cannot convert %s to base 10 integer. Program Closing...' % sys.argv[1])
-    else:
-        print("Random Sample: ")
-        measureSpeedNoAnimation(num_of_points=int(num), shape=Shape.RandomSample.value)
-        
-        print("\n\nFilled Circle: ")
-        measureSpeedNoAnimation(num_of_points=int(num), shape=Shape.FilledCircle.value)
-        
-        print("\n\nSquare: ")
-        measureSpeedNoAnimation(num_of_points=int(num), shape=Shape.Square.value)
-        
-        print("\n\nOutlined Circle: ")
-        measureSpeedNoAnimation(num_of_points=int(num), shape=Shape.OutlinedCircle.value)
-        
-        print("\n\nCluster: ")
-        measureSpeedNoAnimation(num_of_points=int(num), shape=Shape.Cluster.value)
 
-        print("\n\nRandom Sample: ")
-        measureSpeedNoAnimation(num_of_points=int(num), shape=Shape.RandomSample.value)
+    if len(sys.argv) < 3:
+        raise ValueError('Need number of points to perform QuickHull on and Number of trials!')
+    
+    type = sys.argv[1]
+    num = inputVal(sys.argv[2])
+
+    if type == 'a':
+        animationGovernor(generate_random_points = True, num_of_points = num, just_outline = False, pause_interval = .1, shape = Shape.Cluster.value)   
+    
+    else:
+        if len(sys.argv) < 4:
+            raise ValueError('Need number of points to perform QuickHull on and Number of trials!')
+        trials = inputVal(sys.argv[3])
+        
+        measureSpeedNoAnimation(num_of_points = num, trials = trials)
+
+        with open('json_data' + '_' + str(num) + '_' + str(trials) +'.json', 'w') as outfile:
+            json.dump(results, outfile, indent=4)
     
     
-        # animationGovernor(generate_random_points = True, num_of_points = 1e5, just_outline = False, pause_interval = .1, shape = Shape.Cluster.value)   
+        
 
     

@@ -1,0 +1,92 @@
+[
+    {
+        "Shape": "RandomSample",
+        "Time": 0.003730000000000011,
+        "Points on Hull": 17,
+        "Memory Used": 0.05156707763671875
+    },
+    {
+        "Shape": "RandomSample",
+        "Time": 0.0038179000000000407,
+        "Points on Hull": 17,
+        "Memory Used": 0.0515899658203125
+    },
+    {
+        "Shape": "RandomSample",
+        "Time": 0.003986500000000004,
+        "Points on Hull": 20,
+        "Memory Used": 0.05161285400390625
+    },
+    {
+        "Shape": "FilledCircle",
+        "Time": 0.004060500000000022,
+        "Points on Hull": 37,
+        "Memory Used": 0.051616668701171875
+    },
+    {
+        "Shape": "FilledCircle",
+        "Time": 0.0033934999999999382,
+        "Points on Hull": 35,
+        "Memory Used": 0.0516204833984375
+    },
+    {
+        "Shape": "FilledCircle",
+        "Time": 0.003653699999999982,
+        "Points on Hull": 38,
+        "Memory Used": 0.0516204833984375
+    },
+    {
+        "Shape": "Square",
+        "Time": 0.0036043000000000047,
+        "Points on Hull": 24,
+        "Memory Used": 0.051624298095703125
+    },
+    {
+        "Shape": "Square",
+        "Time": 0.00343339999999992,
+        "Points on Hull": 17,
+        "Memory Used": 0.05162811279296875
+    },
+    {
+        "Shape": "Square",
+        "Time": 0.0035755000000000647,
+        "Points on Hull": 23,
+        "Memory Used": 0.05162811279296875
+    },
+    {
+        "Shape": "OutlinedCircle",
+        "Time": 0.013901399999999953,
+        "Points on Hull": 1000,
+        "Memory Used": 0.05162811279296875
+    },
+    {
+        "Shape": "OutlinedCircle",
+        "Time": 0.013693900000000037,
+        "Points on Hull": 1000,
+        "Memory Used": 0.0516357421875
+    },
+    {
+        "Shape": "OutlinedCircle",
+        "Time": 0.014210799999999968,
+        "Points on Hull": 1000,
+        "Memory Used": 0.051639556884765625
+    },
+    {
+        "Shape": "Cluster",
+        "Time": 0.0028367999999999727,
+        "Points on Hull": 11,
+        "Memory Used": 0.051639556884765625
+    },
+    {
+        "Shape": "Cluster",
+        "Time": 0.003193699999999966,
+        "Points on Hull": 12,
+        "Memory Used": 0.051639556884765625
+    },
+    {
+        "Shape": "Cluster",
+        "Time": 0.002879300000000029,
+        "Points on Hull": 12,
+        "Memory Used": 0.051639556884765625
+    }
+]

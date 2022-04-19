@@ -1,0 +1,61 @@
+Shape:  Shape.RandomSample
+done quickhull in: 983.0436336s
+Number of points on hull: 56
+Memory Used: 20.81528091430664 GB
+done sorting counter clockwise in: 0.0007677000000967382s
+
+Shape:  Shape.RandomSample
+done quickhull in: 929.7177672s
+Number of points on hull: 43
+Memory Used: 22.337905883789062 GB
+done sorting counter clockwise in: 6.610000036744168e-05s
+
+Shape:  Shape.RandomSample
+done quickhull in: 929.6908338000003s
+Number of points on hull: 48
+Memory Used: 22.333343505859375 GB
+done sorting counter clockwise in: 8.180000031643431e-05s
+
+Shape:  Shape.FilledCircle
+done quickhull in: 697.1713249999998s
+Number of points on hull: 1581
+Memory Used: 13.363079071044922 GB
+done sorting counter clockwise in: 0.001172000000224216s
+
+Shape:  Shape.FilledCircle
+done quickhull in: 697.2683965000006s
+Number of points on hull: 1591
+Memory Used: 13.366241455078125 GB
+done sorting counter clockwise in: 0.0011839999997391715s
+
+Shape:  Shape.FilledCircle
+done quickhull in: 696.6969448999998s
+Number of points on hull: 1561
+Memory Used: 13.363632202148438 GB
+done sorting counter clockwise in: 0.0010893999997279025s
+
+Shape:  Shape.Square
+done quickhull in: 705.3198014s
+Number of points on hull: 47
+Memory Used: 13.363338470458984 GB
+done sorting counter clockwise in: 8.879999950295314e-05s
+
+Shape:  Shape.Square
+done quickhull in: 678.0689165000003s
+Number of points on hull: 44
+Memory Used: 13.367977142333984 GB
+done sorting counter clockwise in: 5.4600000112259295e-05s
+
+Shape:  Shape.Square
+done quickhull in: 670.4850173000004s
+Number of points on hull: 50
+Memory Used: 13.363826751708984 GB
+done sorting counter clockwise in: 6.029999985912582e-05s
+
+Shape:  Shape.OutlinedCircle
+done quickhull in: 4779.0073405s
+Number of points on hull: 95323662
+Memory Used: 17.364192962646484 GB
+done sorting counter clockwise in: 196.07084020000002s
+
+Shape:  Shape.OutlinedCircle

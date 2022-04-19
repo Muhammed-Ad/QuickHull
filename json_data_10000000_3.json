@@ -1,0 +1,92 @@
+[
+    {
+        "Shape": "RandomSample",
+        "Time": 81.0659822,
+        "Points on Hull": 45,
+        "Memory Used": 2.695812225341797
+    },
+    {
+        "Shape": "RandomSample",
+        "Time": 79.7803216,
+        "Points on Hull": 39,
+        "Memory Used": 2.6993865966796875
+    },
+    {
+        "Shape": "RandomSample",
+        "Time": 79.13998010000003,
+        "Points on Hull": 45,
+        "Memory Used": 2.6987075805664062
+    },
+    {
+        "Shape": "FilledCircle",
+        "Time": 56.972880499999974,
+        "Points on Hull": 715,
+        "Memory Used": 1.6735305786132812
+    },
+    {
+        "Shape": "FilledCircle",
+        "Time": 56.77967469999999,
+        "Points on Hull": 724,
+        "Memory Used": 1.6694984436035156
+    },
+    {
+        "Shape": "FilledCircle",
+        "Time": 58.8890538,
+        "Points on Hull": 743,
+        "Memory Used": 1.6700401306152344
+    },
+    {
+        "Shape": "Square",
+        "Time": 58.40640170000006,
+        "Points on Hull": 40,
+        "Memory Used": 1.6754035949707031
+    },
+    {
+        "Shape": "Square",
+        "Time": 67.02170869999998,
+        "Points on Hull": 34,
+        "Memory Used": 1.6695976257324219
+    },
+    {
+        "Shape": "Square",
+        "Time": 56.56481740000004,
+        "Points on Hull": 44,
+        "Memory Used": 1.675689697265625
+    },
+    {
+        "Shape": "OutlinedCircle",
+        "Time": 394.84070399999996,
+        "Points on Hull": 9988056,
+        "Memory Used": 1.9198532104492188
+    },
+    {
+        "Shape": "OutlinedCircle",
+        "Time": 411.5731088,
+        "Points on Hull": 9987976,
+        "Memory Used": 1.9231643676757812
+    },
+    {
+        "Shape": "OutlinedCircle",
+        "Time": 401.9531832,
+        "Points on Hull": 9987874,
+        "Memory Used": 1.9189224243164062
+    },
+    {
+        "Shape": "Cluster",
+        "Time": 55.635863099999824,
+        "Points on Hull": 17,
+        "Memory Used": 1.674346923828125
+    },
+    {
+        "Shape": "Cluster",
+        "Time": 60.343951899999865,
+        "Points on Hull": 19,
+        "Memory Used": 1.672393798828125
+    },
+    {
+        "Shape": "Cluster",
+        "Time": 55.31350250000014,
+        "Points on Hull": 18,
+        "Memory Used": 1.674346923828125
+    }
+]

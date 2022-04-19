@@ -1,0 +1,20 @@
+[
+    {
+        "Shape": "Cluster",
+        "Time": 623.1643696,
+        "Points on Hull": 21,
+        "Memory Used": 13.385883331298828
+    },
+    {
+        "Shape": "Cluster",
+        "Time": 628.0677729999999,
+        "Points on Hull": 21,
+        "Memory Used": 13.371734619140625
+    },
+    {
+        "Shape": "Cluster",
+        "Time": 626.977723,
+        "Points on Hull": 20,
+        "Memory Used": 13.3763427734375
+    }
+]
